@@ -17,6 +17,8 @@
     <meta name="twitter:description" content="Experience the ultimate Hello World website with stunning animations and interactive elements.">
     <link rel="canonical" href="https://l-earner.github.io/hello-world-site/">
     <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>👋</text></svg>">
+    <link rel="manifest" href="/manifest.json">
+    <meta name="theme-color" content="#667eea">
     <style>
         :root {
             --primary-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
@@ -41,6 +43,23 @@
             overflow-x: hidden;
             position: relative;
             min-height: 100vh;
+            perspective: 1000px;
+            transform-style: preserve-3d;
+        }
+        
+        body.theme-neon {
+            --primary-gradient: linear-gradient(135deg, #ff00ff 0%, #00ffff 100%);
+            --secondary-gradient: linear-gradient(45deg, #ff1744, #00e676, #2196f3, #ffeb3b, #e91e63, #9c27b0);
+        }
+        
+        body.theme-matrix {
+            --primary-gradient: linear-gradient(135deg, #0d0d0d 0%, #1a4a1a 100%);
+            --secondary-gradient: linear-gradient(45deg, #00ff00, #008000, #32cd32, #98fb98, #90ee90, #7cfc00);
+        }
+        
+        body.theme-sunset {
+            --primary-gradient: linear-gradient(135deg, #ff6b35 0%, #f7931e 50%, #ffcb05 100%);
+            --secondary-gradient: linear-gradient(45deg, #ff5722, #ff9800, #ffc107, #ffeb3b, #cddc39, #8bc34a);
         }
         
         @keyframes gradientShift {
@@ -82,6 +101,12 @@
             padding: 2rem;
             position: relative;
             z-index: 2;
+            transform: translateZ(0);
+            transition: transform 0.6s ease;
+        }
+        
+        .container.tilt-effect {
+            transform: rotateX(var(--tilt-x, 0deg)) rotateY(var(--tilt-y, 0deg)) translateZ(50px);
         }
         
         .hello-section {
@@ -272,6 +297,225 @@
             }
         }
         
+        .achievement-toast {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: linear-gradient(135deg, #4caf50, #45a049);
+            color: white;
+            padding: 1rem 1.5rem;
+            border-radius: 10px;
+            box-shadow: 0 4px 20px rgba(76, 175, 80, 0.3);
+            transform: translateX(100%);
+            transition: transform 0.3s ease;
+            z-index: 10000;
+            max-width: 300px;
+        }
+        
+        .achievement-toast.show {
+            transform: translateX(0);
+        }
+        
+        .achievement-title {
+            font-weight: bold;
+            margin-bottom: 0.5rem;
+        }
+        
+        .ai-chat-container {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            width: 300px;
+            height: 400px;
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(20px);
+            border-radius: 15px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            transform: translateY(100%);
+            transition: transform 0.3s ease;
+            z-index: 9999;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .ai-chat-container.active {
+            transform: translateY(0);
+        }
+        
+        .chat-header {
+            padding: 1rem;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            font-weight: bold;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .chat-messages {
+            flex: 1;
+            padding: 1rem;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+        
+        .chat-input-container {
+            padding: 1rem;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            display: flex;
+            gap: 0.5rem;
+        }
+        
+        .chat-input {
+            flex: 1;
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 20px;
+            padding: 0.5rem 1rem;
+            color: white;
+            outline: none;
+        }
+        
+        .chat-input::placeholder {
+            color: rgba(255, 255, 255, 0.6);
+        }
+        
+        .chat-send {
+            background: var(--secondary-gradient);
+            border: none;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            color: white;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .message {
+            max-width: 80%;
+            padding: 0.5rem 1rem;
+            border-radius: 15px;
+            margin: 0.25rem 0;
+        }
+        
+        .message.user {
+            background: var(--secondary-gradient);
+            align-self: flex-end;
+            margin-left: auto;
+        }
+        
+        .message.ai {
+            background: rgba(255, 255, 255, 0.1);
+            align-self: flex-start;
+        }
+        
+        .theme-selector {
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 10px;
+            padding: 1rem;
+            display: flex;
+            gap: 0.5rem;
+            z-index: 9998;
+        }
+        
+        .theme-button {
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            border: 2px solid white;
+            cursor: pointer;
+            transition: transform 0.2s ease;
+        }
+        
+        .theme-button:hover {
+            transform: scale(1.1);
+        }
+        
+        .theme-button.default {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+        
+        .theme-button.neon {
+            background: linear-gradient(135deg, #ff00ff 0%, #00ffff 100%);
+        }
+        
+        .theme-button.matrix {
+            background: linear-gradient(135deg, #0d0d0d 0%, #1a4a1a 100%);
+        }
+        
+        .theme-button.sunset {
+            background: linear-gradient(135deg, #ff6b35 0%, #f7931e 50%, #ffcb05 100%);
+        }
+        
+        .floating-buttons {
+            position: fixed;
+            bottom: 20px;
+            left: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+            z-index: 9997;
+        }
+        
+        .floating-btn {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            border: none;
+            background: var(--secondary-gradient);
+            color: white;
+            font-size: 1.5rem;
+            cursor: pointer;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+        
+        .floating-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 25px rgba(0, 0, 0, 0.4);
+        }
+        
+        .game-stats {
+            position: fixed;
+            top: 20px;
+            right: 350px;
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 10px;
+            padding: 1rem;
+            z-index: 9996;
+            min-width: 200px;
+        }
+        
+        .stat-item {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 0.5rem;
+        }
+        
+        .stat-value {
+            font-weight: bold;
+            color: #ffeaa7;
+        }
+        
+        .webgl-canvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 1;
+            opacity: 0.3;
+        }
+        
         @media (prefers-reduced-motion: reduce) {
             * {
                 animation-duration: 0.01ms !important;
@@ -282,9 +526,69 @@
     </style>
 </head>
 <body>
+    <canvas id="webglCanvas" class="webgl-canvas"></canvas>
     <div class="stars" id="stars"></div>
     
-    <div class="container">
+    <!-- Theme Selector -->
+    <div class="theme-selector">
+        <div class="theme-button default" onclick="changeTheme('default')" title="Default Theme"></div>
+        <div class="theme-button neon" onclick="changeTheme('neon')" title="Neon Theme"></div>
+        <div class="theme-button matrix" onclick="changeTheme('matrix')" title="Matrix Theme"></div>
+        <div class="theme-button sunset" onclick="changeTheme('sunset')" title="Sunset Theme"></div>
+    </div>
+    
+    <!-- Game Stats -->
+    <div class="game-stats">
+        <div class="stat-item">
+            <span>Level:</span>
+            <span class="stat-value" id="userLevel">1</span>
+        </div>
+        <div class="stat-item">
+            <span>XP:</span>
+            <span class="stat-value" id="userXP">0</span>
+        </div>
+        <div class="stat-item">
+            <span>Achievements:</span>
+            <span class="stat-value" id="achievementCount">0</span>
+        </div>
+        <div class="stat-item">
+            <span>Streak:</span>
+            <span class="stat-value" id="clickStreak">0</span>
+        </div>
+    </div>
+    
+    <!-- Floating Action Buttons -->
+    <div class="floating-buttons">
+        <button class="floating-btn" onclick="toggleAIChat()" title="AI Assistant">🤖</button>
+        <button class="floating-btn" onclick="toggleVoiceMode()" title="Voice Commands">🎤</button>
+        <button class="floating-btn" onclick="shareWebsite()" title="Share">📤</button>
+        <button class="floating-btn" onclick="showEasterEgg()" title="Easter Egg">🥚</button>
+    </div>
+    
+    <!-- AI Chat Container -->
+    <div class="ai-chat-container" id="aiChat">
+        <div class="chat-header">
+            <span>🤖 AI Assistant</span>
+            <button onclick="toggleAIChat()" style="background: none; border: none; color: white; cursor: pointer;">✕</button>
+        </div>
+        <div class="chat-messages" id="chatMessages">
+            <div class="message ai">
+                Hi! I'm your AI assistant. Try saying "Hello" or ask me about this amazing website! 🌟
+            </div>
+        </div>
+        <div class="chat-input-container">
+            <input type="text" class="chat-input" placeholder="Type your message..." id="chatInput" onkeypress="handleChatEnter(event)">
+            <button class="chat-send" onclick="sendMessage()">📤</button>
+        </div>
+    </div>
+    
+    <!-- Achievement Toast -->
+    <div class="achievement-toast" id="achievementToast">
+        <div class="achievement-title"></div>
+        <div class="achievement-desc"></div>
+    </div>
+    
+    <div class="container" id="mainContainer">
         <div class="hello-section">
             <span class="emoji" id="mainEmoji">👋</span>
             <h1 class="title">Hello World!</h1>
@@ -348,33 +652,387 @@
             }
         }
         
-        // Interactive emoji click counter
-        let clickCount = 0;
-        const emojis = ['👋', '🌍', '🚀', '⭐', '🎉', '💫', '🔥', '💎', '🌟', '✨'];
+        // Advanced Game State Management
+        let gameState = {
+            clickCount: 0,
+            userLevel: 1,
+            userXP: 0,
+            achievementCount: 0,
+            clickStreak: 0,
+            consecutiveClicks: 0,
+            lastClickTime: 0,
+            achievements: new Set(),
+            currentTheme: 'default',
+            soundEnabled: true,
+            voiceMode: false,
+            totalVisitTime: 0,
+            sessionStartTime: Date.now()
+        };
         
-        function updateClickCount() {
-            clickCount++;
-            document.getElementById('clickCount').textContent = clickCount;
+        const emojis = ['👋', '🌍', '🚀', '⭐', '🎉', '💫', '🔥', '💎', '🌟', '✨', '🎨', '⚡', '🎯', '🏆', '👑', '💪'];
+        
+        // Advanced AI Responses
+        const aiResponses = {
+            hello: ['Hello there! 👋 Welcome to the most advanced Hello World site ever created!', 'Hi! 🌟 You\'re experiencing cutting-edge web technology right here!', 'Greetings! 🚀 This site showcases the future of web development!'],
+            help: ['Try clicking the emoji, use voice commands, or change themes! There are hidden easter eggs too! 🥚', 'You can level up by interacting, earn achievements, and even chat with me! 🎮', 'Explore the floating buttons, try different themes, and discover secret features! ✨'],
+            awesome: ['You\'re awesome too! 🌟 Thanks for appreciating this technological marvel!', 'This site really is something special! 💎 Built with love and cutting-edge tech!', 'Glad you think so! 🚀 Wait until you see all the hidden features!'],
+            features: ['This site has AI chat, voice commands, 3D effects, WebGL, themes, achievements, and so much more! 🎯', 'I can detect 15+ revolutionary features including gamification, real-time effects, and advanced accessibility! ⚡', 'From particle physics to neural networks, this Hello World site has it all! 🧠'],
+            default: ['That\'s interesting! 🤔 Try asking me about the site features or say "help"!', 'I\'m here to help! 💡 Ask me about achievements, themes, or easter eggs!', 'Fascinating! 🔍 Try experimenting with the voice commands or hidden features!']
+        };
+        
+        // Achievement System
+        const achievements = [
+            { id: 'first_click', name: 'First Wave', desc: 'Give your first wave!', xp: 10 },
+            { id: 'click_master', name: 'Wave Master', desc: 'Give 25 waves!', xp: 50, requirement: () => gameState.clickCount >= 25 },
+            { id: 'theme_explorer', name: 'Style Explorer', desc: 'Try all themes!', xp: 30, requirement: () => gameState.achievements.has('theme_neon') && gameState.achievements.has('theme_matrix') && gameState.achievements.has('theme_sunset') },
+            { id: 'ai_conversationalist', name: 'AI Whisperer', desc: 'Chat with the AI!', xp: 25 },
+            { id: 'voice_commander', name: 'Voice Master', desc: 'Use voice commands!', xp: 40 },
+            { id: 'easter_hunter', name: 'Secret Hunter', desc: 'Find the easter egg!', xp: 100 },
+            { id: 'streak_legend', name: 'Streak Legend', desc: 'Achieve 10+ click streak!', xp: 75, requirement: () => gameState.clickStreak >= 10 },
+            { id: 'level_up', name: 'Level Up!', desc: 'Reach level 5!', xp: 200, requirement: () => gameState.userLevel >= 5 },
+            { id: 'dedication', name: 'Dedicated Visitor', desc: 'Spend 5+ minutes exploring!', xp: 150, requirement: () => (Date.now() - gameState.sessionStartTime) >= 300000 }
+        ];
+        
+        // Advanced Click Handler with Gamification
+        function updateClickCount(event) {
+            const now = Date.now();
+            const timeSinceLastClick = now - gameState.lastClickTime;
             
-            // Change main emoji randomly
+            // Update streak logic
+            if (timeSinceLastClick < 2000) {
+                gameState.consecutiveClicks++;
+                gameState.clickStreak = Math.max(gameState.clickStreak, gameState.consecutiveClicks);
+            } else {
+                gameState.consecutiveClicks = 1;
+            }
+            
+            gameState.lastClickTime = now;
+            gameState.clickCount++;
+            
+            // XP and Level System
+            const xpGain = Math.min(10 + gameState.consecutiveClicks, 50);
+            gameState.userXP += xpGain;
+            
+            const newLevel = Math.floor(gameState.userXP / 100) + 1;
+            if (newLevel > gameState.userLevel) {
+                gameState.userLevel = newLevel;
+                showAchievement('Level Up!', `Welcome to level ${newLevel}! 🎉`);
+                playSound('levelup');
+            }
+            
+            // Update UI
+            document.getElementById('clickCount').textContent = gameState.clickCount;
+            document.getElementById('userLevel').textContent = gameState.userLevel;
+            document.getElementById('userXP').textContent = gameState.userXP;
+            document.getElementById('clickStreak').textContent = gameState.clickStreak;
+            
+            // Dynamic emoji with more variety
             const mainEmoji = document.getElementById('mainEmoji');
             mainEmoji.textContent = emojis[Math.floor(Math.random() * emojis.length)];
             
-            // Create particle effect
-            createParticle(event.clientX, event.clientY);
+            // Enhanced particle effects
+            createAdvancedParticle(event ? event.clientX : window.innerWidth/2, event ? event.clientY : window.innerHeight/2);
+            
+            // 3D tilt effect
+            applyTiltEffect(event);
+            
+            // Sound feedback
+            playSound('click');
+            
+            // Check achievements
+            checkAchievements();
+            
+            // First click achievement
+            if (gameState.clickCount === 1) {
+                unlockAchievement('first_click');
+            }
         }
         
-        function createParticle(x, y) {
-            const particle = document.createElement('div');
-            particle.className = 'particle';
-            particle.textContent = emojis[Math.floor(Math.random() * emojis.length)];
-            particle.style.left = x + 'px';
-            particle.style.top = y + 'px';
-            document.body.appendChild(particle);
+        // Advanced Particle System
+        function createAdvancedParticle(x, y) {
+            const particleCount = Math.min(5 + gameState.consecutiveClicks, 15);
+            
+            for (let i = 0; i < particleCount; i++) {
+                setTimeout(() => {
+                    const particle = document.createElement('div');
+                    particle.className = 'particle';
+                    particle.textContent = emojis[Math.floor(Math.random() * emojis.length)];
+                    
+                    const offsetX = (Math.random() - 0.5) * 200;
+                    const offsetY = (Math.random() - 0.5) * 200;
+                    
+                    particle.style.left = (x + offsetX) + 'px';
+                    particle.style.top = (y + offsetY) + 'px';
+                    particle.style.fontSize = (1 + Math.random()) + 'rem';
+                    particle.style.filter = `hue-rotate(${Math.random() * 360}deg)`;
+                    
+                    document.body.appendChild(particle);
+                    
+                    setTimeout(() => {
+                        if (particle.parentNode) particle.remove();
+                    }, 2000);
+                }, i * 50);
+            }
+        }
+        
+        // 3D Tilt Effect
+        function applyTiltEffect(event) {
+            if (event && window.innerWidth > 768) {
+                const container = document.getElementById('mainContainer');
+                const rect = container.getBoundingClientRect();
+                const centerX = rect.left + rect.width / 2;
+                const centerY = rect.top + rect.height / 2;
+                
+                const deltaX = (event.clientX - centerX) / (rect.width / 2);
+                const deltaY = (event.clientY - centerY) / (rect.height / 2);
+                
+                const tiltX = deltaY * 10;
+                const tiltY = -deltaX * 10;
+                
+                container.style.setProperty('--tilt-x', tiltX + 'deg');
+                container.style.setProperty('--tilt-y', tiltY + 'deg');
+                container.classList.add('tilt-effect');
+                
+                setTimeout(() => {
+                    container.classList.remove('tilt-effect');
+                }, 1000);
+            }
+        }
+        
+        // Sound System
+        function playSound(type) {
+            if (!gameState.soundEnabled) return;
+            
+            const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+            const oscillator = audioContext.createOscillator();
+            const gainNode = audioContext.createGain();
+            
+            oscillator.connect(gainNode);
+            gainNode.connect(audioContext.destination);
+            
+            switch(type) {
+                case 'click':
+                    oscillator.frequency.value = 800 + (gameState.consecutiveClicks * 50);
+                    gainNode.gain.setValueAtTime(0.1, audioContext.currentTime);
+                    gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.3);
+                    break;
+                case 'achievement':
+                    oscillator.frequency.value = 880;
+                    gainNode.gain.setValueAtTime(0.2, audioContext.currentTime);
+                    gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.5);
+                    break;
+                case 'levelup':
+                    oscillator.frequency.value = 1320;
+                    gainNode.gain.setValueAtTime(0.3, audioContext.currentTime);
+                    gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.8);
+                    break;
+            }
+            
+            oscillator.start();
+            oscillator.stop(audioContext.currentTime + 1);
+        }
+        
+        // Achievement System
+        function unlockAchievement(achievementId) {
+            if (gameState.achievements.has(achievementId)) return;
+            
+            const achievement = achievements.find(a => a.id === achievementId);
+            if (achievement) {
+                gameState.achievements.add(achievementId);
+                gameState.userXP += achievement.xp;
+                gameState.achievementCount++;
+                
+                document.getElementById('achievementCount').textContent = gameState.achievementCount;
+                document.getElementById('userXP').textContent = gameState.userXP;
+                
+                showAchievement(achievement.name, achievement.desc);
+                playSound('achievement');
+            }
+        }
+        
+        function showAchievement(title, desc) {
+            const toast = document.getElementById('achievementToast');
+            toast.querySelector('.achievement-title').textContent = title;
+            toast.querySelector('.achievement-desc').textContent = desc;
+            toast.classList.add('show');
             
             setTimeout(() => {
-                particle.remove();
-            }, 2000);
+                toast.classList.remove('show');
+            }, 4000);
+        }
+        
+        function checkAchievements() {
+            achievements.forEach(achievement => {
+                if (achievement.requirement && achievement.requirement() && !gameState.achievements.has(achievement.id)) {
+                    unlockAchievement(achievement.id);
+                }
+            });
+        }
+        
+        // Theme System
+        function changeTheme(theme) {
+            document.body.className = theme !== 'default' ? `theme-${theme}` : '';
+            gameState.currentTheme = theme;
+            gameState.achievements.add(`theme_${theme}`);
+            
+            playSound('click');
+            createAdvancedParticle(window.innerWidth / 2, window.innerHeight / 2);
+            
+            if (theme !== 'default') {
+                setTimeout(() => checkAchievements(), 100);
+            }
+        }
+        
+        // AI Chat System
+        function toggleAIChat() {
+            const chatContainer = document.getElementById('aiChat');
+            chatContainer.classList.toggle('active');
+            
+            if (chatContainer.classList.contains('active')) {
+                document.getElementById('chatInput').focus();
+            }
+        }
+        
+        function sendMessage() {
+            const input = document.getElementById('chatInput');
+            const message = input.value.trim();
+            
+            if (!message) return;
+            
+            addChatMessage(message, 'user');
+            input.value = '';
+            
+            setTimeout(() => {
+                const response = getAIResponse(message);
+                addChatMessage(response, 'ai');
+                
+                if (!gameState.achievements.has('ai_conversationalist')) {
+                    unlockAchievement('ai_conversationalist');
+                }
+            }, 1000);
+        }
+        
+        function addChatMessage(text, type) {
+            const messagesContainer = document.getElementById('chatMessages');
+            const messageDiv = document.createElement('div');
+            messageDiv.className = `message ${type}`;
+            messageDiv.textContent = text;
+            messagesContainer.appendChild(messageDiv);
+            messagesContainer.scrollTop = messagesContainer.scrollHeight;
+        }
+        
+        function getAIResponse(message) {
+            const lowerMessage = message.toLowerCase();
+            
+            if (lowerMessage.includes('hello') || lowerMessage.includes('hi')) {
+                return aiResponses.hello[Math.floor(Math.random() * aiResponses.hello.length)];
+            } else if (lowerMessage.includes('help')) {
+                return aiResponses.help[Math.floor(Math.random() * aiResponses.help.length)];
+            } else if (lowerMessage.includes('awesome') || lowerMessage.includes('amazing') || lowerMessage.includes('cool')) {
+                return aiResponses.awesome[Math.floor(Math.random() * aiResponses.awesome.length)];
+            } else if (lowerMessage.includes('feature') || lowerMessage.includes('what can')) {
+                return aiResponses.features[Math.floor(Math.random() * aiResponses.features.length)];
+            } else {
+                return aiResponses.default[Math.floor(Math.random() * aiResponses.default.length)];
+            }
+        }
+        
+        function handleChatEnter(event) {
+            if (event.key === 'Enter') {
+                sendMessage();
+            }
+        }
+        
+        // Voice Recognition System
+        function toggleVoiceMode() {
+            if (!('webkitSpeechRecognition' in window) && !('SpeechRecognition' in window)) {
+                addChatMessage('Voice recognition not supported in this browser. Try Chrome!', 'ai');
+                toggleAIChat();
+                return;
+            }
+            
+            gameState.voiceMode = !gameState.voiceMode;
+            
+            if (gameState.voiceMode) {
+                startVoiceRecognition();
+                unlockAchievement('voice_commander');
+            }
+        }
+        
+        function startVoiceRecognition() {
+            const SpeechRecognition = window.webkitSpeechRecognition || window.SpeechRecognition;
+            const recognition = new SpeechRecognition();
+            
+            recognition.continuous = true;
+            recognition.interimResults = true;
+            recognition.lang = 'en-US';
+            
+            recognition.onresult = (event) => {
+                const result = event.results[event.results.length - 1];
+                if (result.isFinal) {
+                    const command = result[0].transcript.toLowerCase();
+                    handleVoiceCommand(command);
+                }
+            };
+            
+            recognition.start();
+            
+            addChatMessage('🎤 Voice mode activated! Try saying "click", "change theme", or "hello"', 'ai');
+            toggleAIChat();
+        }
+        
+        function handleVoiceCommand(command) {
+            if (command.includes('click') || command.includes('wave')) {
+                updateClickCount();
+            } else if (command.includes('theme')) {
+                const themes = ['neon', 'matrix', 'sunset', 'default'];
+                const randomTheme = themes[Math.floor(Math.random() * themes.length)];
+                changeTheme(randomTheme);
+            } else if (command.includes('hello') || command.includes('hi')) {
+                addChatMessage(command, 'user');
+                addChatMessage(getAIResponse(command), 'ai');
+                toggleAIChat();
+            }
+        }
+        
+        // Easter Egg System
+        function showEasterEgg() {
+            const easterEggs = [
+                () => {
+                    document.body.style.transform = 'rotate(360deg)';
+                    setTimeout(() => document.body.style.transform = '', 2000);
+                },
+                () => {
+                    const colors = ['hue-rotate(180deg)', 'hue-rotate(90deg)', 'hue-rotate(270deg)'];
+                    document.body.style.filter = colors[Math.floor(Math.random() * colors.length)];
+                    setTimeout(() => document.body.style.filter = '', 3000);
+                },
+                () => {
+                    for (let i = 0; i < 50; i++) {
+                        setTimeout(() => {
+                            createAdvancedParticle(Math.random() * window.innerWidth, Math.random() * window.innerHeight);
+                        }, i * 100);
+                    }
+                }
+            ];
+            
+            easterEggs[Math.floor(Math.random() * easterEggs.length)]();
+            unlockAchievement('easter_hunter');
+            playSound('achievement');
+        }
+        
+        // Share Functionality
+        function shareWebsite() {
+            if (navigator.share) {
+                navigator.share({
+                    title: '🌍 The World\'s Best Hello World Website',
+                    text: 'Check out this incredible Hello World site with AI, 3D effects, and more!',
+                    url: window.location.href
+                });
+            } else {
+                navigator.clipboard.writeText(window.location.href);
+                showAchievement('Link Copied!', 'Website URL copied to clipboard! 📋');
+            }
         }
         
         // Magic button functionality
@@ -423,13 +1081,22 @@
             }
         });
         
-        // Initialize
+        // Initialize Legendary Website
         document.addEventListener('DOMContentLoaded', () => {
             createStars();
+            initializeWebGL();
+            loadGameState();
             
             // Add event listeners
             document.getElementById('mainEmoji').addEventListener('click', updateClickCount);
             document.getElementById('magicButton').addEventListener('click', handleMagicClick);
+            
+            // Mouse movement for 3D effects
+            document.addEventListener('mousemove', (e) => {
+                if (Math.random() < 0.1) { // Throttle for performance
+                    applyTiltEffect(e);
+                }
+            });
             
             // Feature cards interaction
             document.querySelectorAll('.feature-card').forEach(card => {
@@ -463,6 +1130,119 @@
                     'event_label': 'hello_world_site'
                 });
             }
+        }
+        
+        // WebGL Background Effects
+        function initializeWebGL() {
+            const canvas = document.getElementById('webglCanvas');
+            const gl = canvas.getContext('webgl') || canvas.getContext('experimental-webgl');
+            
+            if (!gl) return; // WebGL not supported
+            
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+            
+            // Simple shader program for animated background
+            const vertexShader = gl.createShader(gl.VERTEX_SHADER);
+            gl.shaderSource(vertexShader, `
+                attribute vec2 position;
+                void main() {
+                    gl_Position = vec4(position, 0.0, 1.0);
+                }
+            `);
+            gl.compileShader(vertexShader);
+            
+            const fragmentShader = gl.createShader(gl.FRAGMENT_SHADER);
+            gl.shaderSource(fragmentShader, `
+                precision mediump float;
+                uniform float time;
+                uniform vec2 resolution;
+                
+                void main() {
+                    vec2 uv = gl_FragCoord.xy / resolution.xy;
+                    vec3 color = vec3(
+                        sin(time * 0.5 + uv.x * 3.0) * 0.5 + 0.5,
+                        sin(time * 0.7 + uv.y * 3.0) * 0.5 + 0.5,
+                        sin(time * 0.3 + (uv.x + uv.y) * 2.0) * 0.5 + 0.5
+                    );
+                    gl_FragColor = vec4(color, 0.1);
+                }
+            `);
+            gl.compileShader(fragmentShader);
+            
+            const program = gl.createProgram();
+            gl.attachShader(program, vertexShader);
+            gl.attachShader(program, fragmentShader);
+            gl.linkProgram(program);
+            gl.useProgram(program);
+            
+            // Create full-screen quad
+            const vertices = new Float32Array([
+                -1, -1, 1, -1, -1, 1, 1, 1
+            ]);
+            const buffer = gl.createBuffer();
+            gl.bindBuffer(gl.ARRAY_BUFFER, buffer);
+            gl.bufferData(gl.ARRAY_BUFFER, vertices, gl.STATIC_DRAW);
+            
+            const positionLocation = gl.getAttribLocation(program, 'position');
+            gl.enableVertexAttribArray(positionLocation);
+            gl.vertexAttribPointer(positionLocation, 2, gl.FLOAT, false, 0, 0);
+            
+            const timeLocation = gl.getUniformLocation(program, 'time');
+            const resolutionLocation = gl.getUniformLocation(program, 'resolution');
+            
+            gl.uniform2f(resolutionLocation, canvas.width, canvas.height);
+            
+            // Animation loop
+            function animate(time) {
+                gl.uniform1f(timeLocation, time * 0.001);
+                gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
+                requestAnimationFrame(animate);
+            }
+            
+            requestAnimationFrame(animate);
+        }
+        
+        // Game State Persistence
+        function saveGameState() {
+            localStorage.setItem('helloWorldGameState', JSON.stringify({
+                clickCount: gameState.clickCount,
+                userLevel: gameState.userLevel,
+                userXP: gameState.userXP,
+                achievementCount: gameState.achievementCount,
+                clickStreak: gameState.clickStreak,
+                achievements: Array.from(gameState.achievements),
+                currentTheme: gameState.currentTheme
+            }));
+        }
+        
+        function loadGameState() {
+            const saved = localStorage.getItem('helloWorldGameState');
+            if (saved) {
+                const state = JSON.parse(saved);
+                gameState.clickCount = state.clickCount || 0;
+                gameState.userLevel = state.userLevel || 1;
+                gameState.userXP = state.userXP || 0;
+                gameState.achievementCount = state.achievementCount || 0;
+                gameState.clickStreak = state.clickStreak || 0;
+                gameState.achievements = new Set(state.achievements || []);
+                gameState.currentTheme = state.currentTheme || 'default';
+                
+                // Update UI
+                document.getElementById('clickCount').textContent = gameState.clickCount;
+                document.getElementById('userLevel').textContent = gameState.userLevel;
+                document.getElementById('userXP').textContent = gameState.userXP;
+                document.getElementById('achievementCount').textContent = gameState.achievementCount;
+                document.getElementById('clickStreak').textContent = gameState.clickStreak;
+                
+                // Apply saved theme
+                if (gameState.currentTheme !== 'default') {
+                    changeTheme(gameState.currentTheme);
+                }
+            }
+            
+            // Auto-save every 10 seconds
+            setInterval(saveGameState, 10000);
         }
         
         // Service Worker for offline functionality
